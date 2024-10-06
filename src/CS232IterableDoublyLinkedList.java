@@ -9,8 +9,7 @@ import java.util.NoSuchElementException;
  * @author Dickinson College
  * @version Feb 18, 2016
  */
-public class CS232IterableDoublyLinkedList<E> implements CS232List<E>,
-		CS232Iterable<E> {
+public class CS232IterableDoublyLinkedList<E> implements CS232List<E>, CS232Iterable<E> {
 
 	private DLLNode head;
 	private DLLNode tail;
@@ -157,6 +156,7 @@ public class CS232IterableDoublyLinkedList<E> implements CS232List<E>,
 	private class DLLIterator implements CS232Iterator<E> {
 
 		private DLLNode cursor;
+		private boolean canRemove = false;
 
 		public DLLIterator() {
 			cursor = head;
@@ -171,18 +171,29 @@ public class CS232IterableDoublyLinkedList<E> implements CS232List<E>,
 				throw new NoSuchElementException("There is no next element.");
 			} else {
 				cursor = cursor.next;
+				this.canRemove = true;
 				return cursor.element;
 			}
 		}
 
 		public boolean hasPrevious() {
 			// Intentionally not implemented, see HW assignment!
-			throw new UnsupportedOperationException("Not implemented");
+//			if (this.cursor == head) {
+//				return false;
+//			}
+			return this.cursor.prev != head && this.cursor.prev != null;
 		}
 
 		public E previous() {
 			// Intentionally not implemented, see HW assignment!
-			throw new UnsupportedOperationException("Not implemented");
+			if (!hasPrevious()) {
+				throw new NoSuchElementException("There is no previous element.");
+			}
+			else {
+				this.cursor = this.cursor.prev;
+				this.canRemove = true;
+				return this.cursor.element;
+			}
 		}
 
 		public void insert(E element) {
@@ -193,9 +204,19 @@ public class CS232IterableDoublyLinkedList<E> implements CS232List<E>,
 			size++;
 		}
 
-		public E remove() {
+		public E remove() throws NoSuchElementException {
 			// Intentionally not implemented, see HW assignment!
-			throw new UnsupportedOperationException("Not implemented");
+			if(!canRemove) {
+				throw new IllegalStateException("Remove can only be called once after next/previous");
+			}
+
+			DLLNode removed = this.cursor;
+			removed.prev.next = removed.next;
+			removed.next.prev = removed.prev;
+
+			CS232IterableDoublyLinkedList.this.size-=1;
+			this.canRemove = false;
+			return removed.element;
 		}
 	}
 	
