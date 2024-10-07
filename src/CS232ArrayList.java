@@ -156,10 +156,10 @@ public class CS232ArrayList<E> implements CS232List<E>, CS232Iterable<E>{
     }
 
     private class ArrayListIterator implements CS232Iterator<E> {
-        private int cursor;
+        private double cursor;
 
         public ArrayListIterator() {
-            this.cursor = -1;
+            this.cursor = -0.5;
         }
 
         @Override
@@ -172,8 +172,9 @@ public class CS232ArrayList<E> implements CS232List<E>, CS232Iterable<E>{
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            this.cursor+=1;
-            return CS232ArrayList.this.get(cursor);
+            E returnValue = CS232ArrayList.this.get((int)(cursor+0.5));
+            cursor += 1;
+            return returnValue;
         }
 
         @Override
@@ -186,8 +187,9 @@ public class CS232ArrayList<E> implements CS232List<E>, CS232Iterable<E>{
             if (!hasPrevious()) {
                 throw new NoSuchElementException();
             }
-            this.cursor -= 1;
-            return CS232ArrayList.this.get(cursor);
+            E returnValue = CS232ArrayList.this.get((int)(cursor-0.5));
+            cursor -= 1;
+            return returnValue;
         }
 
         @Override
