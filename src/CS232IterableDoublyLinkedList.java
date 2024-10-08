@@ -9,8 +9,7 @@ import java.util.NoSuchElementException;
  * @author Dickinson College
  * @version Feb 18, 2016
  */
-public class CS232IterableDoublyLinkedList<E> implements CS232List<E>,
-		CS232Iterable<E> {
+public class CS232IterableDoublyLinkedList<E> implements CS232List<E>, CS232Iterable<E> {
 
 	private DLLNode head;
 	private DLLNode tail;
@@ -152,14 +151,21 @@ public class CS232IterableDoublyLinkedList<E> implements CS232List<E>,
 	}
 
 	/*
-	 * Iterator implementation for the doubly linked list.
+	An alternate implementation of the iterator considering a different approach
+	Further comment:
+					 Considering the definition of next() and previous() methods in CS232Iterator,
+					 I believe the test cases for Q6 and Q7 are correctly written.
+
+	          		 A visual interpretation of this implementation should be a cursor that is located
+	          		 between the elements in the list, instead of pointing directly to the elements themselves.
 	 */
 	private class DLLIterator implements CS232Iterator<E> {
 
 		private DLLNode cursor;
+		private DLLNode previousReturnValue;
 
 		public DLLIterator() {
-			cursor = head;
+			this.cursor=CS232IterableDoublyLinkedList.this.head;
 		}
 
 		public boolean hasNext() {
@@ -170,19 +176,26 @@ public class CS232IterableDoublyLinkedList<E> implements CS232List<E>,
 			if (!hasNext()) {
 				throw new NoSuchElementException("There is no next element.");
 			} else {
-				cursor = cursor.next;
-				return cursor.element;
+				this.cursor = this.cursor.next;
+				this.previousReturnValue = this.cursor;
+				return this.previousReturnValue.element;
 			}
 		}
 
 		public boolean hasPrevious() {
-			// Intentionally not implemented, see HW assignment!
-			throw new UnsupportedOperationException("Not implemented");
+			return this.cursor != head;
 		}
 
 		public E previous() {
 			// Intentionally not implemented, see HW assignment!
-			throw new UnsupportedOperationException("Not implemented");
+			if (!hasPrevious()) {
+				throw new NoSuchElementException("There is no previous element.");
+			}
+			else {
+				this.previousReturnValue = cursor;
+				cursor = cursor.prev;
+				return this.previousReturnValue.element;
+			}
 		}
 
 		public void insert(E element) {
@@ -193,12 +206,23 @@ public class CS232IterableDoublyLinkedList<E> implements CS232List<E>,
 			size++;
 		}
 
-		public E remove() {
+		public E remove() throws NoSuchElementException {
 			// Intentionally not implemented, see HW assignment!
-			throw new UnsupportedOperationException("Not implemented");
+			if(this.previousReturnValue==null) {
+				throw new IllegalStateException("Remove can only be called once after next/previous");
+			}
+
+			DLLNode removed = this.previousReturnValue;
+			removed.prev.next = removed.next;
+			removed.next.prev = removed.prev;
+
+			this.cursor=removed.prev;
+			CS232IterableDoublyLinkedList.this.size-=1;
+			this.previousReturnValue = null;
+			return removed.element;
 		}
 	}
-	
+
 	/**
 	 * Helper method for testing that checks that all of the links are
 	 * symmetric.

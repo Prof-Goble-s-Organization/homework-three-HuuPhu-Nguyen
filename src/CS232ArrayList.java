@@ -1,5 +1,7 @@
 package hw03;
 
+import java.util.NoSuchElementException;
+
 /**
  * An implementation of the CS132List interface backed with an array of Objects.
  * 
@@ -7,7 +9,7 @@ package hw03;
  * @author Dickinson College
  * @version Feb 18, 2016
  */
-public class CS232ArrayList<E> implements CS232List<E> {
+public class CS232ArrayList<E> implements CS232List<E>, CS232Iterable<E>{
 
     private static final int INITIAL_CAPACITY = 10;
 
@@ -143,5 +145,63 @@ public class CS232ArrayList<E> implements CS232List<E> {
 
             return elem;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public CS232Iterator<E> getIterator() {
+        return new ArrayListIterator();
+    }
+
+    private class ArrayListIterator implements CS232Iterator<E> {
+        private double cursor;
+
+        public ArrayListIterator() {
+            this.cursor = -0.5;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return cursor+1 < currentSize;
+        }
+
+        @Override
+        public E next() throws NoSuchElementException {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            E returnValue = CS232ArrayList.this.get((int)(cursor+0.5));
+            cursor += 1;
+            return returnValue;
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return cursor > 0;
+        }
+
+        @Override
+        public E previous() throws NoSuchElementException {
+            if (!hasPrevious()) {
+                throw new NoSuchElementException();
+            }
+            E returnValue = CS232ArrayList.this.get((int)(cursor-0.5));
+            cursor -= 1;
+            return returnValue;
+        }
+
+        @Override
+        public void insert(E element) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public E remove() {
+            throw new UnsupportedOperationException();
+        }
+
+
     }
 }
